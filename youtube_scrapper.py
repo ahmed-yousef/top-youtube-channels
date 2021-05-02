@@ -31,7 +31,7 @@ soup = BeautifulSoup(html,'html.parser')
 names = soup.find_all('ytd-video-renderer',class_='ytd-item-section-renderer')
 links=[]
 add=0
-
+print(len(names))
 for i in names:
     #get video link
     video_link = i.find_all('a')[0]['href']
@@ -59,7 +59,7 @@ for i in names:
     channel_name = i.find_all('yt-formatted-string',class_='ytd-channel-name')[0].find_all('a')[0].text
     
     #get channel stats
-    print(about_url%video_channel)
+    #print(about_url%video_channel)
     driver2.get(about_url%video_channel)
     channel = driver2.page_source
     soup2 = BeautifulSoup(channel,'html.parser')
@@ -79,6 +79,7 @@ for i in names:
             
     #get inception date
     inception_date = soup2.find_all('div',id='right-column')[0].find_all('span')[1].text
+    
 
 
 
