@@ -8,7 +8,7 @@ import pandas as pds
 from datetime import datetime
 now = datetime.now()
 
-search_url = 'https://www.youtube.com/results?search_query={0}&sp={1}'.format(input('Please enter search query\n'),'CAMSAggF')
+search_url = 'https://www.youtube.com/results?search_query={0}'.format(input('Please enter search query\n'))
 num_pages = input('Pleas input number of pages (consider the time it takes)\n')
 about_url='https://www.youtube.com%s/about'
 DRIVER_PATH = os.getcwd()+'\\chromedriver.exe'
@@ -24,7 +24,7 @@ pages=0
 
 while pages < int(num_pages):
     html.send_keys(Keys.END)
-    time.sleep(2.5)
+    time.sleep(1.5)
     pages+=1
 html = driver.page_source
 soup = BeautifulSoup(html,'html.parser')
@@ -39,10 +39,18 @@ for i in names:
 
     #get video views
     video_views = i.find_all('div',id='metadata-line')[0].find_all('span')[0].text[:-6]
-    if video_views[-1] == 'K':
+    if video_views == 'No':
+        video_views = 0
+    elif len(video_views) == 0 :
+        video_views = 0
+    elif video_views[-2:] == 'wa':
+        video_views = float(video_views[:-3])
+    elif video_views[-1] == 'K':
         video_views = float(video_views[:-1])*1000
     elif video_views[-1] == 'M':
         video_views = float(video_views[:-1])*1000000
+    else:
+        video_views = float(i.find_all('div',id='metadata-line')[0].find_all('span')[0].text[:-6])
 
     #get video channel
     video_channel = i.find_all('div',id='channel-info')[0].find_all('a')[0]['href']
@@ -60,13 +68,14 @@ for i in names:
     get_channel_views = float(soup2.find_all('div',id='right-column')[0].find_all(class_='ytd-channel-about-metadata-renderer')[2].text[:-6].replace(',',''))
     #get subscribers numbers
     get_sub_num = soup2.find_all('yt-formatted-string',id='subscriber-count')[0].text[:-12]
-    try:
-        if get_sub_num[-1] == 'K':
-            get_sub_num = float(get_sub_num[:-1])*1000
-        elif get_sub_num[-1] == 'M':
-            get_sub_num = float(get_sub_num[:-1])*1000000
-    except:
-        get_sub_num=0
+    if len(get_sub_num) == 0:
+        get_sub_num
+    elif get_sub_num[-1] == 'K':
+        get_sub_num = float(get_sub_num[:-1])*1000
+    elif get_sub_num[-1] == 'M':
+        get_sub_num = float(get_sub_num[:-1])*1000000
+    else:
+        get_sub_num = float(soup2.find_all('yt-formatted-string',id='subscriber-count')[0].text[:-12])
             
     #get inception date
     inception_date = soup2.find_all('div',id='right-column')[0].find_all('span')[1].text
