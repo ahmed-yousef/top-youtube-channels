@@ -4,8 +4,12 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 import time
+import pandas as pds
+from datetime import datetime
+now = datetime.now()
 
-search_url='https://www.youtube.com/results?search_query={0}&sp={1}'.format(input('Please enter search query\n'),'CAMSAggF')
+search_url = 'https://www.youtube.com/results?search_query={0}&sp={1}'.format(input('Please enter search query\n'),'CAMSAggF')
+num_pages = input('Pleas input number of pages (consider the time it takes)\n')
 about_url='https://www.youtube.com%s/about'
 DRIVER_PATH = os.getcwd()+'\\chromedriver.exe'
 
@@ -18,7 +22,7 @@ driver.get(search_url)
 html = driver.find_element_by_tag_name('html')
 pages=0
 
-while pages < 1:
+while pages < int(num_pages):
     html.send_keys(Keys.END)
     time.sleep(2.5)
     pages+=1
@@ -75,4 +79,9 @@ for i in names:
     except:
         pass
     add+=1
-print(len(links))
+    
+data_frame = pds.DataFrame(links,columns=['channel_name','video_link','video_views','video_channel','get_channel_views','get_sub_num','inception_date'])
+file_name = now.strftime("%d-%m-%Y-%H.%M.%S")
+
+data_frame.to_excel(os.getcwd()+'\\'+file_name+'.xlsx')
+print('Script finshed with total queries of {0} query and data shape is {1} rows X {2} columns'.format(str(len(links)),len(data_frame),len(data_frame.columns)))
