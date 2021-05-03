@@ -29,7 +29,8 @@ while pages < int(num_pages):
 html = driver.page_source
 soup = BeautifulSoup(html,'html.parser')
 names = soup.find_all('ytd-video-renderer',class_='ytd-item-section-renderer')
-links=[]
+links = []
+channels = {}
 add=0
 print(len(names))
 for i in names:
@@ -60,25 +61,30 @@ for i in names:
     
     #get channel stats
     #print(about_url%video_channel)
-    driver2.get(about_url%video_channel)
-    channel = driver2.page_source
-    soup2 = BeautifulSoup(channel,'html.parser')
+    try:
+        get_channel_views,get_sub_num,inception_date = channels[video_channel]
+    except:
+        driver2.get(about_url%video_channel)
+        channel = driver2.page_source
+        soup2 = BeautifulSoup(channel,'html.parser')
 
-    #get channel views
-    get_channel_views = float(soup2.find_all('div',id='right-column')[0].find_all(class_='ytd-channel-about-metadata-renderer')[2].text[:-6].replace(',',''))
-    #get subscribers numbers
-    get_sub_num = soup2.find_all('yt-formatted-string',id='subscriber-count')[0].text[:-12]
-    if len(get_sub_num) == 0:
-        get_sub_num
-    elif get_sub_num[-1] == 'K':
-        get_sub_num = float(get_sub_num[:-1])*1000
-    elif get_sub_num[-1] == 'M':
-        get_sub_num = float(get_sub_num[:-1])*1000000
-    else:
-        get_sub_num = float(soup2.find_all('yt-formatted-string',id='subscriber-count')[0].text[:-12])
-            
-    #get inception date
-    inception_date = soup2.find_all('div',id='right-column')[0].find_all('span')[1].text
+        #get channel views
+        get_channel_views = float(soup2.find_all('div',id='right-column')[0].find_all(class_='ytd-channel-about-metadata-renderer')[2].text[:-6].replace(',',''))
+        #get subscribers numbers
+        get_sub_num = soup2.find_all('yt-formatted-string',id='subscriber-count')[0].text[:-12]
+        if len(get_sub_num) == 0:
+            get_sub_num
+        elif get_sub_num[-1] == 'K':
+            get_sub_num = float(get_sub_num[:-1])*1000
+        elif get_sub_num[-1] == 'M':
+            get_sub_num = float(get_sub_num[:-1])*1000000
+        else:
+            get_sub_num = float(soup2.find_all('yt-formatted-string',id='subscriber-count')[0].text[:-12])
+                
+        #get inception date
+        inception_date = soup2.find_all('div',id='right-column')[0].find_all('span')[1].text
+        channels[video_channel] = [get_channel_views,get_sub_num,inception_date]
+
     
 
 
